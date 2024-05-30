@@ -11,8 +11,8 @@ const ibmPlexSerif = IBM_Plex_Serif({
 })
 
 export const metadata: Metadata = {
-  title: "HaraBank",
-  description: "HaraBank is a modern banking platform for all",
+  title: "BlitSend",
+  description: "BlitSend is a modern banking platform for everyone",
   icons:{
     icon:'/icons/logo.svg'
   }
