@@ -1,3 +1,4 @@
+
 import Image from "next/image";
 
 import { topCategoryStyles } from "@/constants";
@@ -31,6 +32,7 @@ const Category = ({ category }: CategoryProps) => {
           indicatorClassName={cn("h-2 w-full", indicator)}
         />
       </div>
+
     </div>
   );
 };

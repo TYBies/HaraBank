@@ -1,84 +1,75 @@
+
 "use client";
 
 import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useState } from "react";
 
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-} from "@/components/ui/select";
-import { formUrlQuery, formatAmount } from "@/lib/utils";
+  cn,
+  formUrlQuery,
+  formatAmount,
+  getAccountTypeColors,
+} from "@/lib/utils";
 
-export const BankDropdown = ({
-  accounts = [],
-  setValue,
-  otherStyles,
-}: BankDropdownProps) => {
-  const searchParams = useSearchParams();
+const BankInfo = ({ account, appwriteItemId, type }: BankInfoProps) => {
   const router = useRouter();
-  const [selected, setSelected] = useState(accounts[0]);
+  const searchParams = useSearchParams();
 
-  const handleBankChange = (id: string) => {
-    const account = accounts.find((account) => account.appwriteItemId === id)!;
+  const isActive = appwriteItemId === account?.appwriteItemId;
 
-    setSelected(account);
+  const handleBankChange = () => {
     const newUrl = formUrlQuery({
       params: searchParams.toString(),
       key: "id",
-      value: id,
+      value: account?.appwriteItemId,
     });
     router.push(newUrl, { scroll: false });
-
-    if (setValue) {
-      setValue("senderBank", id);
-    }
   };
 
+  const colors = getAccountTypeColors(account?.type as AccountTypes);
+
   return (
-    <Select
-      defaultValue={selected.id}
-      onValueChange={(value) => handleBankChange(value)}
+    <div
+      onClick={handleBankChange}
+      className={cn(`bank-info ${colors.bg}`, {
+        "shadow-sm border-blue-700": type === "card" && isActive,
+        "rounded-xl": type === "card",
+        "hover:shadow-sm cursor-pointer": type === "card",
+      })}
     >
-      <SelectTrigger
-        className={`flex w-full bg-white gap-3 md:w-[300px] ${otherStyles}`}
+      <figure
+        className={`flex-center h-fit rounded-full bg-blue-100 ${colors.lightBg}`}
       >
         <Image
-          src="icons/credit-card.svg"
+          src="/icons/connect-bank.svg"
           width={20}
           height={20}
-          alt="account"
+          alt={account.subtype}
+          className="m-2 min-w-5"
         />
-        <p className="line-clamp-1 w-full text-left">{selected.name}</p>
-      </SelectTrigger>
-      <SelectContent
-        className={`w-full bg-white md:w-[300px] ${otherStyles}`}
-        align="end"
-      >
-        <SelectGroup>
-          <SelectLabel className="py-2 font-normal text-gray-500">
-            Select a bank to display
-          </SelectLabel>
-          {accounts.map((account: Account) => (
-            <SelectItem
-              key={account.id}
-              value={account.appwriteItemId}
-              className="cursor-pointer border-t"
+      </figure>
+      <div className="flex w-full flex-1 flex-col justify-center gap-1">
+        <div className="bank-info_content">
+          <h2
+            className={`text-16 line-clamp-1 flex-1 font-bold text-blue-900 ${colors.title}`}
+          >
+            {account.name}
+          </h2>
+          {type === "full" && (
+            <p
+              className={`text-12 rounded-full px-3 py-1 font-medium text-blue-700 ${colors.subText} ${colors.lightBg}`}
             >
-              <div className="flex flex-col ">
-                <p className="text-16 font-medium">{account.name}</p>
-                <p className="text-14 font-medium text-blue-600">
-                  {formatAmount(account.currentBalance)}
-                </p>
-              </div>
-            </SelectItem>
-          ))}
-        </SelectGroup>
-      </SelectContent>
-    </Select>
+              {account.subtype}
+            </p>
+          )}
+        </div>
+
+        <p className={`text-16 font-medium text-blue-700 ${colors.subText}`}>
+          {formatAmount(account.currentBalance)}
+        </p>
+      </div>
+    </div>
   );
 };
+
+export default BankInfo;
